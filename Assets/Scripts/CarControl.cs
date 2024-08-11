@@ -2,6 +2,9 @@ using UnityEngine;
 
 public class CarControl : MonoBehaviour
 {
+    public bool inverseSteering = false;
+    public bool inverseAcceleration = false;
+    
     public float motorTorque = 2000;
     public float brakeTorque = 2000;
     public float maxSpeed = 20;
@@ -28,12 +31,12 @@ public class CarControl : MonoBehaviour
     void Update()
     {
 
-        float vInput = Input.GetAxis("Vertical");
-        float hInput = Input.GetAxis("Horizontal");
+        float vInput = Input.GetAxis("Vertical") * (inverseAcceleration ? -1 : 1);
+        float hInput = Input.GetAxis("Horizontal") * (inverseSteering ? -1 : 1);
 
         // Calculate current speed in relation to the forward direction of the car
         // (this returns a negative number when traveling backwards)
-        float forwardSpeed = Vector3.Dot(transform.forward, rigidBody.velocity);
+        float forwardSpeed = Vector3.Dot(transform.forward * -1, rigidBody.velocity);
 
 
         // Calculate how close the car is to top speed
@@ -50,7 +53,7 @@ public class CarControl : MonoBehaviour
 
         // Check whether the user input is in the same direction 
         // as the car's velocity
-        bool isAccelerating = Mathf.Sign(vInput) == Mathf.Sign(forwardSpeed);
+        bool isAccelerating = Mathf.Sign(vInput) != Mathf.Sign(forwardSpeed);
 
         foreach (var wheel in wheels)
         {
